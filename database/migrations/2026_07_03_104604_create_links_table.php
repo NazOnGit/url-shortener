@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('links', function (Blueprint $table) {
             $table->id();
             // delete all links associated with a user when the user is deleted
-            $table->foreignId('user_id')->constrained()->cascasdeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('original_url');
             $table->string('short_code')->unique();
             $table->timestamps();
