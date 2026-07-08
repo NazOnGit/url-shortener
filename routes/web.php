@@ -39,6 +39,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+    // Delete Link Route
+    //
+    // When the logged-in user submits a delete request for /links/{link},
+    // Laravel finds the row where links.id = {link}
+    // and passes that row to LinkController::destroy().
+    Route::delete('/links/{link}', [LinkController::class, 'destroy'])->name('links.destroy');
 });
 
 

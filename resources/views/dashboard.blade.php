@@ -63,13 +63,38 @@
                          links.id = 8 points to /links/8/stats
 
                          FLOW:
-                         
+
                          Dashboard -> Click "View Statistics" -> route('links.stats', $link->id) -> /links/8/stats -> LinkController::stats($link) -> stats.blade.php
                     --}}
                     <a href="{{ route('links.stats', $link->id) }}">
                         View Statistics
                     </a>
 
+                    {{-- Create a form to delete the current link. --}}
+                    {{-- Delete Link Form
+                        route('links.destroy', $link->id)
+
+                        uses the route:
+                        DELETE /links/{link}
+
+                        and replaces the `{link}` placeholder with the current
+                        link's id from the `links` table.
+
+                        Example:
+                        links.id = 8
+                        ↓
+                        DELETE /links/8
+                    --}}
+                    <form action="{{ route('links.destroy', $link->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this link?');">
+
+                        {{-- CSRF token and DELETE method are required for the form to work. --}}
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="mt-3 px-4 py-2 bg-red-600 text-white rounded">
+                            Delete Link
+                        </button>
+
+                    </form>
                     <div>
 
                         {{-- Display one shortened link. --}}

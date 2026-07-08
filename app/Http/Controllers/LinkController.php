@@ -196,4 +196,19 @@ class LinkController extends Controller
             ->route('dashboard')
             ->with('success', 'Link created successfully!');
     }
+
+
+
+    public function destroy(Link $link)
+    {
+
+
+        // // Delete the row from the `links` table where links.id matches {link} placeholder in the URL.
+        $link->delete();
+
+        // Redirect back to the dashboard with a success message.
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Link deleted successfully!');
+    }
 }
