@@ -23,21 +23,38 @@ Route::middleware('auth')->group(function () {
     // Laravel sends the request to LinkController::store().
     Route::post('/links', [LinkController::class, 'store'])->name('links.store');
 
+    // Match the route to show the analytics page for a specific link.
+    // What the user types in the browser:
+    // https://yoursite.com/links/5/stats
+    // Where number 5 comes from: the user clicked a link, or typed it manually. It's the ID of a link they want to see stats for.
+    // Route parameters: {link} is a placeholder for the link's ID.
+    // Laravel looks at the {link} placeholder in the URL (/links/5/stats), sees the number 5, and looks for a row in the links table where id = 5.
+    // If a matching row is found, Laravel passes that row to LinkController::stats() as the $link parameter.
+    // That row becomes the $link object (an instance of the
+    // Link model), which is passed into this method.
+    // public function stats(Link $link) in LinkController.php receives the $link object and can access its properties, such as $link->original_url, $link->short_code, etc.
+    Route::get('/links/{link}/stats', [LinkController::class, 'stats'])
+        ->name('links.stats');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
 // Load Breeze authentication routes first: /login, /register, /logout, etc.
 require __DIR__ . '/auth.php';
 
 
+
 // Public short-link redirect route must stay last.
+
 // Redirect Route
 //
 // Visitor opens: http://127.0.0.1:8000/eR7aM8
-// Laravel matches the URL against this route: /{shortCode}
+
+// {shortCode} is dynamic and can be anything.
+// {}: It is a placeholder for any string that comes after the domain name or  forward slash / in the URL. The {shortCode} is a route parameter that captures the value from the URL and passes it to the controller method as an argument. In this case, it will capture "eR7aM8" and pass it to LinkController::redirect($shortCode).
 // Laravel assigns: {shortCode} = "eR7aM8"
 // Laravel calls: LinkController::redirect($shortCode)
 // The `$shortCode` parameter now contains: "eR7aM8" and is passed to the redirect() method in LinkController.

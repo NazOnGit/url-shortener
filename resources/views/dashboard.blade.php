@@ -41,8 +41,12 @@
 
                     {{-- START: display links that belong to the authenticated user --}}
                     <h2>Your Links</h2>
+
                     {{-- Loop through every link passed to this view by LinkController@index. --}}
                     @forelse ($links as $link)
+
+                    <p>Clicks: {{ $link->clicks_count }}</p>
+
                     <div>
 
                         {{-- Display one shortened link. --}}

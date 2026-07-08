@@ -1,5 +1,5 @@
 <?php
-// WHAT IS A MODEL?
+// WHAT IS AN ELOQUENT MODEL?
 // A model is a PHP class that Laravel uses to work with one database table.
 // Laravel says: Whenever I need to work with the links table, I'll use the Link model.
 
@@ -63,9 +63,14 @@ class Link extends Model
     /**
      * RELATIONSHIPS BETWEEN LINK AND CLICK MODELS
      * Why does Link know about Click? Because a link can have many clicks.
+     * 
      */
     public function clicks(): HasMany
     {
+        // a link can have many clicks from different users, but a click belongs to one link or points back to a specific link.
+        // the purpose of clicks table is to record every time a visitor clicks a shortened link, so we can grab data from the clicks table to see how many clicks each link has received by the number of rows created in the clicks table in which link_id column from clicks table is the same as the link's id from links table being the main row holding the link information such as the original URL and short_code.
+        // different users can click the same link, and each click will be recorded in the clicks table as a new row with the same link_id but different ip_address and created_at timestamp.
+        // if we dont do this, we still can count the number of clicks for a link but we would loose Which IP clicked? When did they click? The complete history of clicks.
         return $this->hasMany(Click::class);
     }
 }

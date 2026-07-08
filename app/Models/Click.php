@@ -45,7 +45,7 @@ class Click extends Model
      * It just teaches Laravel how the models are connected.
      * After that, you can do:
      *   $click->link
-     * and Laravel will fetch the correct Link.
+     * and Laravel will fetch the correct Link data.
      */
     public function link(): BelongsTo
     {
