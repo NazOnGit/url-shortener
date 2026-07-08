@@ -47,6 +47,29 @@
 
                     <p>Clicks: {{ $link->clicks_count }}</p>
 
+                    {{-- Create a link to the statistics page for the current link.
+                         
+                         route('links.stats', $link->id)
+                         
+                         uses the route:
+                         
+                         /links/{link}/stats
+                         
+                         and replaces the `{link}` placeholder with the current
+                         link's id from the `links` table.
+                         
+                         Example:
+                         
+                         links.id = 8 points to /links/8/stats
+
+                         FLOW:
+                         
+                         Dashboard -> Click "View Statistics" -> route('links.stats', $link->id) -> /links/8/stats -> LinkController::stats($link) -> stats.blade.php
+                    --}}
+                    <a href="{{ route('links.stats', $link->id) }}">
+                        View Statistics
+                    </a>
+
                     <div>
 
                         {{-- Display one shortened link. --}}
