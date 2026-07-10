@@ -24,90 +24,142 @@
                 <!-- Flow: -->
                 <!-- dashboard form submits → links.store route → LinkController store() -->
                 <div class="p-6 bg-gray-50 border-t border-gray-200">
+                    {{-- CREATE SHORT LINK FORM
+                         Flow:
+                           User enters a URL
+                           → POST /links (route('links.store'))
+                           → LinkController::store()
+                           → validate, generate short code, save, redirect
+                    --}}
                     <form method="POST" action="{{ route('links.store') }}">
+
+                        {{-- Generate a CSRF token so Laravel accepts this POST request. --}}
                         @csrf
 
-                        <input
-                            type="url"
-                            name="original_url"
-                            placeholder="Enter original URL"
-                            required
-                            class="w-full border rounded p-2">
+                        <label for="original_url" class="block mb-2 font-medium">
+                            Original URL
+                        </label>
 
-                        <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded">
-                            Create short link
-                        </button>
-                    </form>
+                        <div class="flex items-end gap-3">
 
-                    {{-- START: display links that belong to the authenticated user --}}
-                    <h2>Your Links</h2>
+                            <input
+                                type="url"
+                                id="original_url"
+                                name="original_url"
+                                placeholder="Enter original URL"
+                                required
+                                class="w-full h-11 px-3 border rounded">
 
-                    {{-- Loop through every link passed to this view by LinkController@index. --}}
-                    @forelse ($links as $link)
+                            <button
+                                type="submit"
+                                class="h-11 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">
+                                Create Short Link
+                            </button>
 
-                    <p>Clicks: {{ $link->clicks_count }}</p>
-
-                    {{-- Create a link to the statistics page for the current link.
-                         
-                         route('links.stats', $link->id)
-                         
-                         uses the route:
-                         
-                         /links/{link}/stats
-                         
-                         and replaces the `{link}` placeholder with the current
-                         link's id from the `links` table.
-                         
-                         Example:
-                         
-                         links.id = 8 points to /links/8/stats
-
-                         FLOW:
-
-                         Dashboard -> Click "View Statistics" -> route('links.stats', $link->id) -> /links/8/stats -> LinkController::stats($link) -> stats.blade.php
-                    --}}
-                    <a href="{{ route('links.stats', $link->id) }}">
-                        View Statistics
-                    </a>
-
-                    {{-- Create a form to delete the current link. --}}
-                    {{-- Delete Link Form
-                        route('links.destroy', $link->id)
-
-                        uses the route:
-                        DELETE /links/{link}
-
-                        and replaces the `{link}` placeholder with the current
-                        link's id from the `links` table.
-
-                        Example:
-                        links.id = 8
-                        ↓
-                        DELETE /links/8
-                    --}}
-                    <form action="{{ route('links.destroy', $link->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this link?');">
-
-                        {{-- CSRF token and DELETE method are required for the form to work. --}}
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="mt-3 px-4 py-2 bg-red-600 text-white rounded">
-                            Delete Link
-                        </button>
+                        </div>
 
                     </form>
-                    <div>
 
-                        {{-- Display one shortened link. --}}
-                        <p>{{ $link->original_url }}</p>
-                        <a href="{{ url($link->short_code) }}" target="_blank">{{ url($link->short_code) }}</a>
-                    </div>
+                    {{-- START: Display links that belong to the authenticated user. --}}
+                    <h2 class="mt-8 text-lg font-semibold mb-4">Your Links</h2>
 
-                    @empty
-                    {{-- Display a message when the user has not created any links. --}}
-                    <p>You haven't created any links yet.</p>
-                    @endforelse
+                    <table class="w-full border border-gray-300 border-collapse">
+
+                        <thead class="bg-gray-100">
+
+                            <tr>
+                                <th class="border border-gray-300 p-2">#</th>
+                                <th class="border border-gray-300 p-2">Original URL</th>
+                                <th class="border border-gray-300 p-2">Short URL</th>
+                                <th class="border border-gray-300 p-2">Clicks</th>
+                                <th class="border border-gray-300 p-2 text-center">Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {{-- Loop through every link passed from LinkController::index().
+
+                                 Each `$link` represents one row from the `links` table.
+                            --}}
+                            @forelse ($links as $link)
+
+                            <tr>
+
+                                {{-- Display links.id --}}
+                                <td class="border border-gray-300 p-2">
+                                    {{ $link->id }}
+                                </td>
+
+                                {{-- Display links.original_url --}}
+                                <td class="border border-gray-300 p-2 break-all max-w-xs">
+                                    {{ $link->original_url }}
+                                </td>
+
+                                {{-- Display the full shortened URL created from links.short_code --}}
+                                <td class="border border-gray-300 p-2">
+                                    <a href="{{ url($link->short_code) }}" target="_blank">
+                                        {{ url($link->short_code) }}
+                                    </a>
+                                </td>
+
+                                {{-- Display the temporary clicks_count property added by withCount('clicks'). --}}
+                                <td class="border border-gray-300 p-2 text-center">
+                                    {{ $link->clicks_count }}
+                                </td>
+
+                                <td class="border border-gray-300 p-2 text-center">
+
+                                    {{-- Open the statistics page for the current link. --}}
+                                    <a href="{{ route('links.stats', $link->id) }}">
+                                        <button
+                                            type="button"
+                                            class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2">
+                                            Statistics
+                                        </button>
+                                    </a>
+
+                                    {{-- Delete the current link. --}}
+                                    <form
+                                        action="{{ route('links.destroy', $link->id) }}"
+                                        method="POST"
+                                        class="inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this link?');">
+
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            type="submit"
+                                            class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            @empty
+
+                            <tr>
+
+                                <td colspan="5" class="border border-gray-300 p-4 text-center">
+                                    You haven't created any links yet.
+                                </td>
+
+                            </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </x-app-layout>
