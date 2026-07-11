@@ -125,6 +125,17 @@ class LinkController extends Controller
 
     public function stats(Link $link)
     {
+        // CHECK IF USER OWNS THE LINK //
+
+        // $link is the Link model object that Laravel created from the row in the `links` table where links.id = {link} route parameter.
+        // $link Reads the user_id column from the current row stored in $link.
+        // auth()->id() gets the ID of the currently logged-in user from the session. from the users table.
+        // compares the user_id column from the current row in the links table to the ID of the currently logged-in user.
+        // If the two values do not match, the visitor is not authorized to view this link's analytics, so Laravel aborts the request and returns a 403 Forbidden response.
+        abort_if($link->user_id !== auth()->id(), 403);
+
+        // GET ALL CLICKS FOR THE LINK //
+
         // `$link` already holds the matching row from the `links` table.
         // Call the `clicks()` relationship defined in Link.php.
         // The `clicks()` relationship uses:
@@ -176,10 +187,20 @@ class LinkController extends Controller
         // Store the validated URL in a variable so the create logic uses checked data.
         $originalUrl = $validatedData['original_url'];
 
-        // Generate a random 6-character code for the shortened URL.
-        // Browser submits URL → Controller receives URL → Controller generates short code → Controller tells the Link model to save everything.
 
-        $shortCode = Str::random(6);
+        // GENERATE A UNIQUE SHORT CODE FOR THE LINK //
+        do {
+            // Generate a random 6-character code for the shortened URL.
+            // Browser submits URL → Controller receives URL → Controller generates short code → Controller tells the Link model to save everything.
+
+            $shortCode = Str::random(6);
+
+            // Check if the generated short code already exists in the database. in what table? in the links table. if it exists, generate a new one. if it doesn't exist, use it.
+            // Link::where('short_code', $shortCode) searches the links table for a row where the short_code column equals the generated $shortCode.
+            // ->exists() checks if any rows were found. If a row was found, it returns true. If no rows were found, it returns false.
+            // If the generated short code already exists in the database, the loop continues and generates a new one. If it does not exist, the loop ends and the code is used to create the new link.
+        } while (Link::where('short_code', $shortCode)->exists());
+
 
         // Create a new row in the `links` table with Link model being responsible for working with anything link-related.
         // because it is a new row, we use Link::create() instead of Link::update().
@@ -201,9 +222,11 @@ class LinkController extends Controller
 
     public function destroy(Link $link)
     {
+        // CHECK IF USER OWNS THE LINK //
+        abort_if($link->user_id !== auth()->id(), 403);
 
 
-        // // Delete the row from the `links` table where links.id matches {link} placeholder in the URL.
+        // Delete the row from the `links` table where links.id matches {link} placeholder in the URL from route.
         $link->delete();
 
         // Redirect back to the dashboard with a success message.
