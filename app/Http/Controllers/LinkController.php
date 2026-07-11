@@ -180,9 +180,17 @@ class LinkController extends Controller
     {
         // Validate the submitted URL before Laravel creates a short link.
         // If validation fails, Laravel redirects the user back and does not run the code below.
-        $validatedData = $request->validate([
-            'original_url' => ['required', 'url', 'max:2048']
-        ]);
+        $validatedData = $request->validate(
+            [
+                // Validate that the original_url field is required, is a valid URL, and does not exceed 2048 characters.
+                'original_url' => ['required', 'url', 'max:2048'],
+            ],
+            [
+                // Custom error messages for validation failures.
+                'original_url.required' => 'Please enter a URL.',
+                'original_url.url' => 'Please enter a valid URL (e.g., https://example.com).',
+            ]
+        );
 
         // Store the validated URL in a variable so the create logic uses checked data.
         $originalUrl = $validatedData['original_url'];

@@ -50,6 +50,14 @@
                                 required
                                 class="w-full h-11 px-3 border rounded">
 
+                            {{-- Display validation error message for the original_url field. --}}
+                            @error('original_url')
+                            <p class="mt-2 text-sm text-red-600">
+                                {{$message}}
+                            </p>
+                            @enderror
+
+                            {{-- Submit button to create a short link. --}}
                             <button
                                 type="submit"
                                 class="h-11 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">
