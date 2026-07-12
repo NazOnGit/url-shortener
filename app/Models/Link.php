@@ -41,7 +41,10 @@ class Link extends Model
      *   id | user_id | original_url
      *   8  |   3     | google.com
      *
-     * The link only stores user_id = 3.
+     * The link table only stores user_id = 3.
+     * The link object $link is an instance of the Link model, which represents a single row in the links table.
+     * The links table is the actual database table that stores all the link records. The link object corresponds to a specific row in that table, and it has properties that represent the columns of that row, such as id, user_id, original_url, and short_code.
+     * The user_id property in the Link model represents the FOREIGN KEY that connects the link to its owner in the users table. It indicates which user created or owns that specific link.
      * It does not store anything else about User #3.
      * The User data is in the users table.
      *
@@ -53,7 +56,7 @@ class Link extends Model
      * After that, you can do:
      *   $link->user
      * and Laravel will fetch the correct User.
-     * Meaning Look at this link's user_id column, find the user whose id matches it, and return that user.
+     * Meaning Look at this link's table user_id column, find the user whose id matches it, and return that user.
      */
     public function user(): BelongsTo
     {
